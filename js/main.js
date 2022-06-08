@@ -55,8 +55,17 @@ function initializeVideo() {
   duration.setAttribute('datetime', `${time.minutes}m ${time.seconds}s`)
 }
 
+// updateTimeElapsed indicates how far through the video
+// the current playback is
+function updateTimeElapsed() {
+  const time = formatTime(Math.round(video.currentTime));
+  timeElapsed.innerText = `${time.minutes}:${time.seconds}`;
+  timeElapsed.setAttribute('datetime', `${time.minutes}m ${time.seconds}s`)
+}
+
 
 playButton.addEventListener('click', togglePlay);
 video.addEventListener('play', updatePlayButton);
 video.addEventListener('pause', updatePlayButton);
 video.addEventListener('loadedmetadata', initializeVideo);
+video.addEventListener('timeupdate', updateTimeElapsed);
