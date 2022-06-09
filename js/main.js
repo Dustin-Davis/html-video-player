@@ -87,6 +87,15 @@ function updateSeekTooltip() {
   seekTooltip.style.left = `${event.pageX - rect.left}px`;
 }
 
+// skipAhead jumps to a different point in the video when
+// the progress bar is clicked
+function skipAhead(event) {
+  const skipTo = event.target.dataset.seek ? event.target.dataset.seek : event.target.value;
+  video.currentTime = skipTo;
+  progressBar.value = skipTo;
+  seek.value = skipTo;
+}
+
 
 playButton.addEventListener('click', togglePlay);
 video.addEventListener('play', updatePlayButton);
@@ -95,3 +104,4 @@ video.addEventListener('loadedmetadata', initializeVideo);
 video.addEventListener('timeupdate', updateTimeElapsed);
 video.addEventListener('timeupdate', updateProgress);
 seek.addEventListener('mousemove', updateSeekTooltip);
+seek.addEventListener('input', skipAhead);
