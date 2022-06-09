@@ -6,6 +6,7 @@ const timeElapsed = document.getElementById('time-elapsed');
 const duration = document.getElementById('duration');
 const progressBar = document.getElementById('progress-bar');
 const seek = document.getElementById('seek');
+const seekTooltip = document.getElementById('seek-tooltip');
 
 const videoWorks = !!document.createElement('video').canPlayType; // canPlayType is to detect support for a video format in a browser. !! = shorthand to make a boolean
 if (videoWorks) {
@@ -74,9 +75,23 @@ function updateProgress() {
   progressBar.value = Math.floor(video.currentTime)
 }
 
+// updateSeekTooltip uses the position of the mouse on the progress bar to
+// roughly work out what point in the video the user will skip to if
+// the progress bar is clicked at that point
+function updateSeekTooltip() {
+  const skipTo = Math.round((event.offsetX / event.target.clientWidth) * parseInt(event.target.getAttribute('max'), 10));
+  seek.setAttribute('data-seek', skipTo)
+  const t = formatTime(skipTo);
+  seekTooltip.textContent = `${t.minutes}:${t.seconds}`;
+  const rect = video.getBoundingClientRect();
+  seekTooltip.style.left = `${event.pageX - rect.left}px`;
+}
+
+
 playButton.addEventListener('click', togglePlay);
 video.addEventListener('play', updatePlayButton);
 video.addEventListener('pause', updatePlayButton);
 video.addEventListener('loadedmetadata', initializeVideo);
 video.addEventListener('timeupdate', updateTimeElapsed);
 video.addEventListener('timeupdate', updateProgress);
+seek.addEventListener('mousemove', updateSeekTooltip);
