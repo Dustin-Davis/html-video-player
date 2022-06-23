@@ -230,6 +230,34 @@ function showControls() {
   videoControls.classList.remove('hide');
 }
 
+// keyboardShortcuts executes the relevant functions for
+// each supported shortcut key
+function keyboardShortcuts(event) {
+  const { key } = event;
+  switch (key) {
+    case 'k':
+      togglePlay();
+      animatePlayback();
+      if (video.paused) {
+        showControls();
+      } else {
+        setTimeout(() => {
+          hideControls();
+        }, 2000);
+      }
+      break;
+    case 'm':
+      toggleMute();
+      break;
+    case 'f':
+      toggleFullScreen();
+      break;
+    case 'p':
+      togglePip();
+      break;
+  }
+}
+
 playButton.addEventListener('click', togglePlay);
 video.addEventListener('play', updatePlayButton);
 video.addEventListener('pause', updatePlayButton);
@@ -249,6 +277,7 @@ video.addEventListener('mouseenter', showControls);
 video.addEventListener('mouseleave', hideControls);
 videoControls.addEventListener('mouseenter', showControls);
 videoControls.addEventListener('mouseleave', hideControls);
+document.addEventListener('keyup', keyboardShortcuts);
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!('pictureInPictureEnabled' in document)) {
