@@ -13,8 +13,15 @@ const volumeMute = document.querySelector('use[href="#volume-mute"]');
 const volumeLow = document.querySelector('use[href="#volume-low"]');
 const volumeHigh = document.querySelector('use[href="#volume-high"]');
 const volume = document.getElementById('volume');
+const playbackAnimation = document.getElementById('playback-animation');
+const fullscreenButton = document.getElementById('fullscreen-button');
+const videoContainer = document.getElementById('video-container');
+const fullscreenIcons = fullscreenButton.querySelectorAll('use');
 
-const videoWorks = !!document.createElement('video').canPlayType; // canPlayType is to detect support for a video format in a browser. !! = shorthand to make a boolean
+
+// canPlayType is to detect support for a video format in a browser.
+// !! = shorthand to make a boolean
+const videoWorks = !!document.createElement('video').canPlayType;
 if (videoWorks) {
   video.controls = false;
   videoControls.classList.remove('hidden');
@@ -131,6 +138,67 @@ function updateVolumeIcon() {
   }
 }
 
+// toggleMute mutes or unmutes the video when executed
+// When the video is unmuted, the volume is returned to the value
+// it was set to before the video was muted
+function toggleMute() {
+  video.muted = !video.muted;
+
+  if (video.muted) {
+    volume.setAttribute('data-volume', volume.value);
+    volume.value = 0;
+  } else {
+    volume.value = volume.dataset.volume;
+  }
+}
+
+// animatePlayback displays an animation when
+// the video is played or paused
+function animatePlayback() {
+  playbackAnimation.animate([
+    {
+      opacity: 1,
+      transform: "scale(1)",
+    },
+    {
+      opacity: 0,
+      transform: "scale(1.3)",
+    }], {
+    duration: 500,
+  });
+}
+
+// toggleFullScreen toggles the full screen state of the video
+// If the browser is currently in fullscreen mode,
+// then it should exit and vice versa.
+function toggleFullScreen() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else if (document.webkitFullscreenElement) {
+    // Need this to support Safari
+    document.webkitExitFullscreen();
+  } else if (videoContainer.webkitRequestFullscreen) {
+    // Need this to support Safari
+    videoContainer.webkitRequestFullscreen();
+  } else {
+    videoContainer.requestFullscreen();
+  }
+}
+fullscreenButton.onclick = toggleFullScreen;
+
+// updateFullscreenButton changes the icon of the full screen button
+// and tooltip to reflect the current full screen state of the video
+function updateFullscreenButton() {
+  fullscreenIcons.forEach(icon => icon.classList.toggle('hidden'));
+
+  if (document.fullscreenElement) {
+    fullscreenButton.setAttribute('data-title', 'Exit full screen (f)')
+  } else {
+    fullscreenButton.setAttribute('data-title', 'Full screen (f)')
+  }
+}
+
+
 playButton.addEventListener('click', togglePlay);
 video.addEventListener('play', updatePlayButton);
 video.addEventListener('pause', updatePlayButton);
@@ -141,3 +209,7 @@ seek.addEventListener('mousemove', updateSeekTooltip);
 seek.addEventListener('input', skipAhead);
 volume.addEventListener('input', updateVolume);
 video.addEventListener('volumechange', updateVolumeIcon);
+volumeButton.addEventListener('click', toggleMute);
+video.addEventListener('click', togglePlay);
+video.addEventListener('click', animatePlayback);
+videoContainer.addEventListener('fullscreenchange', updateFullscreenButton);
